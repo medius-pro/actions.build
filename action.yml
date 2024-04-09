@@ -4,11 +4,11 @@ inputs:
   composer-home:
     description: 'composer root directory'
     required: false
-    default: ${{ github.workspace }}/.composer
+    default: ${{ format('{0}/.composer', github.workspace) }}
   composer-cache:
     description: 'composer cache directory'
     required: false
-    default: ${{ github.workspace }}/.composer/cache
+    default: ${{ format('{0}/.composer/cache', github.workspace) }}
   path:
     description: 'image path relative to the registry'
     required: true
