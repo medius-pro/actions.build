@@ -37,6 +37,9 @@ runs:
     run: composer install --no-progress --no-scripts --no-plugins --no-autoloader --no-dev -n --ignore-platform-reqs
     shell: sh
     if: steps.composer-cache.outputs.cache-hit != 'true'
+    env:
+      COMPOSER_HOME: ${{ inputs.composer-home }}
+      COMPOSER_CACHE_DIR: ${{ inputs.composer-cache }}
   - name: login to the registry
     uses: docker/login-action@v3
     with:
@@ -45,9 +48,6 @@ runs:
       password: ${{ inputs.password }}
   - name: build and push the image
     uses: docker/build-push-action@v5
-    env:
-      COMPOSER_HOME: ${{ inputs.composer-home }}
-      COMPOSER_CACHE_DIR: ${{ inputs.composer-cache }}
     with:
       context: .
       build-args: |
