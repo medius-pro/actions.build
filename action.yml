@@ -22,22 +22,6 @@ inputs:
   password:
     description: 'registry password'
     required: true
-
-  node:
-    description: 'nodejs version'
-    required: false
-    default: '20'
-  workdir:
-    description: 'root directory for Pulumi files'
-    required: false
-    default: '.pulumi'
-  command:
-    description: 'pulumi command'
-    required: false
-    default: 'up'
-  stack:
-    description: 'pulumi stack'
-    required: true
 runs:
   using: "composite"
   steps:
