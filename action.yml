@@ -1,0 +1,87 @@
+name: 'build and push an image'
+description: 'build an image and push it to the defined registry'
+inputs:
+  composer-home:
+    description: 'composer root directory'
+    required: false
+    default: ${{ github.workspace }}/.composer
+  composer-cache:
+    description: 'composer cache directory'
+    required: false
+    default: ${{ github.workspace }}/.composer/cache
+  path:
+    description: 'image path relative to the registry'
+    required: true
+  registry:
+    description: 'host of the docker registry'
+    required: false
+    default: 'registry.gitlab.com'
+  username:
+    description: 'registry login'
+    required: true
+  password:
+    description: 'registry password'
+    required: true
+
+  node:
+    description: 'nodejs version'
+    required: false
+    default: '20'
+  workdir:
+    description: 'root directory for Pulumi files'
+    required: false
+    default: '.pulumi'
+  command:
+    description: 'pulumi command'
+    required: false
+    default: 'up'
+  stack:
+    description: 'pulumi stack'
+    required: true
+runs:
+  using: "composite"
+  steps:
+  - name: checkout repository
+    uses: actions/checkout@v4
+  - name: restore composer cache
+    uses: actions/cache/restore@v4
+    id: composer-cache
+    with:
+      key: composer.cache.${{ hashFiles('composer.lock') }}
+      path: ${{ inputs.composer-cache }}
+  - name: install composer dependencies
+    run: composer install --no-progress --no-scripts --no-plugins --no-autoloader --no-dev -n --ignore-platform-reqs
+    shell: sh
+    if: steps.composer-cache.outputs.cache-hit != 'true'
+  - name: login to the registry
+    uses: docker/login-action@v3
+    with:
+      registry: ${{ inputs.registry }}
+      username: ${{ inputs.username }}
+      password: ${{ inputs.password }}
+  - name: build and push the image
+    uses: docker/build-push-action@v5
+    env:
+      COMPOSER_HOME: ${{ inputs.composer-home }}
+      COMPOSER_CACHE_DIR: ${{ inputs.composer-cache }}
+    with:
+      context: .
+      build-args: |
+        GIT_COMMIT=${{ github.sha }}
+      push: true
+      tags: ${{ format('{0}/{1}:{2}', inputs.registry, inputs.path, github.sha) }}
+  - name: remove last build tag
+    run: git push origin :refs/tags/build
+    shell: sh
+    continue-on-error: true
+  - name: tag current build
+    run: |
+      git tag build
+      git push origin build
+    shell: sh
+  - name: save composer dependencies
+    uses: actions/cache/save@v4
+    if: steps.composer-cache.outputs.cache-hit != 'true'
+    with:
+      key: composer.cache.${{ hashFiles('composer.lock') }}
+      path: ${{ inputs.composer-cache }}
