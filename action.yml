@@ -44,7 +44,7 @@ runs:
     id: host
     uses: mikefarah/yq@v4
     with:
-      cmd: yq '.image.value.host' ${{ format('{0}/{1}', github.workspace, inputs.pulumi) }}
+      cmd: yq '.image.value.host' ${{ inputs.pulumi }}
   - name: get the registry path from the Pulumi config
     id: path
     uses: mikefarah/yq@v4
