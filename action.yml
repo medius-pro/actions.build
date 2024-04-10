@@ -12,10 +12,10 @@ inputs:
   path:
     description: 'image path relative to the registry'
     required: true
-  registry:
-    description: 'host of the docker registry'
+  pulumi:
+    description: 'pulumi config file path (YAML file relative to workspace directory)'
     required: false
-    default: 'registry.gitlab.com'
+    default: '.pulumi/Pulumi.yaml'
   username:
     description: 'registry login'
     required: true
@@ -46,6 +46,16 @@ runs:
       registry: ${{ inputs.registry }}
       username: ${{ inputs.username }}
       password: ${{ inputs.password }}
+  - name: get the registry host from the Pulumi config
+    id: host
+    uses: mikefarah/yq@v4
+    with:
+      cmd: yq '.image.value.host' ${{ format('{0}/{1}', github.workspace, inputs.pulumi) }}
+  - name: get the registry path from the Pulumi config
+    id: path
+    uses: mikefarah/yq@v4
+    with:
+      cmd: yq '.image.value.path' ${{ format('{0}/{1}', github.workspace, inputs.pulumi) }}
   - name: build and push the image
     uses: docker/build-push-action@v5
     with:
@@ -53,7 +63,7 @@ runs:
       build-args: |
         GIT_COMMIT=${{ github.sha }}
       push: true
-      tags: ${{ format('{0}/{1}:{2}', inputs.registry, inputs.path, github.sha) }}
+      tags: ${{ format('{0}/{1}:{2}', steps.host.outputs.result, steps.path.outputs.result, github.sha) }}
   - name: remove last build tag
     run: git push origin :refs/tags/build
     shell: sh
