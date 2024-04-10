@@ -49,7 +49,7 @@ runs:
     id: path
     uses: mikefarah/yq@v4
     with:
-      cmd: yq '.image.value.path' ${{ format('{0}/{1}', github.workspace, inputs.pulumi) }}
+      cmd: yq '.image.value.path' ${{ inputs.pulumi }}
   - name: login to the registry
     uses: docker/login-action@v3
     with:
