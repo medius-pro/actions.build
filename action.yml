@@ -1,6 +1,10 @@
 name: 'build and push an image'
 description: 'build an image and push it to the defined registry'
 inputs:
+  composer:
+    description: 'include composer dependencies'
+    required: false
+    default: 'true'
   composer-home:
     description: 'composer root directory'
     required: false
@@ -30,13 +34,14 @@ runs:
   - name: restore composer cache
     uses: actions/cache/restore@v4
     id: composer-cache
+    if: inputs.composer == 'true'
     with:
       key: composer.cache.${{ hashFiles('composer.lock') }}
       path: ${{ inputs.composer-cache }}
   - name: install composer dependencies
     run: composer install --no-progress --no-scripts --no-plugins --no-autoloader --no-dev -n --ignore-platform-reqs
     shell: sh
-    if: steps.composer-cache.outputs.cache-hit != 'true'
+    if: inputs.composer == 'true' && steps.composer-cache.outputs.cache-hit != 'true'
     env:
       COMPOSER_HOME: ${{ inputs.composer-home }}
       COMPOSER_CACHE_DIR: ${{ inputs.composer-cache }}
@@ -75,7 +80,7 @@ runs:
     shell: sh
   - name: save composer dependencies
     uses: actions/cache/save@v4
-    if: steps.composer-cache.outputs.cache-hit != 'true'
+    if: inputs.composer == 'true' && steps.composer-cache.outputs.cache-hit != 'true'
     with:
       key: composer.cache.${{ hashFiles('composer.lock') }}
       path: ${{ inputs.composer-cache }}
