@@ -2,7 +2,7 @@ name: 'build and push an image'
 description: 'build an image and push it to the defined registry'
 inputs:
   composer:
-    description: 'include composer dependencies'
+    description: 'install composer dependencies'
     required: false
     default: 'true'
   composer-home:
