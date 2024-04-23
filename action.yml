@@ -19,7 +19,7 @@ inputs:
   pulumi:
     description: 'pulumi config file path (YAML file relative to workspace directory)'
     required: false
-    default: '.pulumi/Pulumi.yaml'
+    default: '.IaC/Pulumi.yaml'
   username:
     description: 'registry login'
     required: true
