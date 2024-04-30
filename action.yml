@@ -32,8 +32,7 @@ runs:
   - name: checkout repository
     uses: actions/checkout@v4
   - name: restore composer cache
-    uses: actions/cache/restore@v4
-    id: composer-cache
+    uses: actions/cache@v4
     if: inputs.composer == 'true'
     with:
       key: composer.cache.${{ hashFiles('composer.lock') }}
@@ -41,7 +40,7 @@ runs:
   - name: install composer dependencies
     run: composer install --no-progress --no-scripts --no-plugins --no-autoloader --no-dev -n --ignore-platform-reqs
     shell: sh
-    if: inputs.composer == 'true' && steps.composer-cache.outputs.cache-hit != 'true'
+    if: inputs.composer == 'true'
     env:
       COMPOSER_HOME: ${{ inputs.composer-home }}
       COMPOSER_CACHE_DIR: ${{ inputs.composer-cache }}
@@ -78,9 +77,3 @@ runs:
       git tag build
       git push origin build
     shell: sh
-  - name: save composer dependencies
-    uses: actions/cache/save@v4
-    if: inputs.composer == 'true' && steps.composer-cache.outputs.cache-hit != 'true'
-    with:
-      key: composer.cache.${{ hashFiles('composer.lock') }}
-      path: ${{ inputs.composer-cache }}
