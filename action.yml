@@ -67,6 +67,8 @@ runs:
       build-args: |
         GIT_COMMIT=${{ github.sha }}
       push: true
+      no-cache: true
+      pull: true
       tags: ${{ format('{0}/{1}:{2}', steps.host.outputs.result, steps.path.outputs.result, github.sha) }}
   - name: remove last build tag
     run: git push origin :refs/tags/build
