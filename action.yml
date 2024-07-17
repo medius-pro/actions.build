@@ -61,7 +61,7 @@ runs:
       username: ${{ inputs.username }}
       password: ${{ inputs.password }}
   - name: build and push the image
-    uses: docker/build-push-action@v5
+    uses: docker/build-push-action@v6
     with:
       context: .
       build-args: |
