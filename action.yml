@@ -13,11 +13,8 @@ inputs:
     description: 'composer cache directory'
     required: false
     default: ${{ format('{0}/.composer/cache', github.workspace) }}
-  path:
-    description: 'image path relative to the registry'
-    required: true
   pulumi:
-    description: 'pulumi config file path (YAML file relative to workspace directory)'
+    description: 'pulumi config file path (YAML file relative to the workspace directory)'
     required: false
     default: '.IaC/Pulumi.yaml'
   username:
